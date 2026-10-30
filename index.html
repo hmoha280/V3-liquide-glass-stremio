@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080d18">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Stremio Glass">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Stremio · Liquid Glass</title>
+<style>
+:root{color-scheme:dark;--bg:#070b14;--glass:rgba(255,255,255,.075);--line:rgba(255,255,255,.13);--muted:#aeb8ca;--accent:#7964ff}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 72% 0%,#45334c 0,transparent 35%),radial-gradient(ellipse at 28% 10%,#173b5b 0,transparent 38%),var(--bg);color:#f7f8fc;font:15px -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}
+button,input{font:inherit}button{color:inherit;cursor:pointer;border:1px solid var(--line);background:var(--glass);border-radius:16px;padding:11px 15px;backdrop-filter:blur(20px)}
+button.primary{background:#f4f5fb;color:#111827;border:0;font-weight:650}button:disabled{opacity:.5}
+.layout{display:grid;grid-template-columns:245px 1fr;min-height:100vh}.side{position:sticky;top:0;height:100vh;padding:28px 18px;border-right:1px solid var(--line);background:rgba(4,8,16,.48);backdrop-filter:blur(26px)}
+.brand{display:flex;align-items:center;gap:12px;font-size:25px;font-weight:800;margin:6px 10px 42px}.logo{width:42px;height:42px;border-radius:14px;background:linear-gradient(140deg,#9a54ff,#5146dd);display:grid;place-items:center;font-size:23px;box-shadow:0 8px 28px #6245ed66}
+nav{display:grid;gap:8px}nav button{border:0;text-align:left;background:transparent;padding:14px 15px;color:#d6dbea}nav button.active,nav button:hover{background:rgba(255,255,255,.12);border:1px solid var(--line)}
+main{padding:26px clamp(18px,3vw,48px) 70px;min-width:0}.top{display:flex;justify-content:flex-end;gap:10px;margin-bottom:24px;flex-wrap:wrap}
+.hero{min-height:360px;border:1px solid var(--line);border-radius:34px;padding:clamp(28px,4vw,54px);display:flex;align-items:end;background:linear-gradient(90deg,rgba(3,10,22,.9),rgba(3,10,22,.28)),radial-gradient(ellipse at 75% 25%,#765b78 0,transparent 48%),linear-gradient(135deg,#0e2c47,#15172c 60%,#442b47);box-shadow:0 22px 70px #0005;overflow:hidden}
+.hero-inner{max-width:690px}.eyebrow{letter-spacing:.18em;color:#c4c9d6;font-size:12px}.hero h1{font-size:clamp(36px,5vw,58px);line-height:1.03;margin:18px 0}.hero p{color:#d0d6e2;line-height:1.55;font-size:17px;max-width:600px}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}
+.section{margin-top:30px}.section-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}.section h2{font-size:22px;margin:0}.hint{color:var(--muted);font-size:12px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:15px}.poster{min-width:0}.poster-art{aspect-ratio:2/3;border-radius:18px;border:1px solid var(--line);background:linear-gradient(145deg,#20354d,#151a2a 65%,#3b3151);overflow:hidden;display:flex;align-items:end;padding:12px;position:relative}.poster-art img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.poster-art:after{content:"";position:absolute;inset:35% 0 0;background:linear-gradient(transparent,#060a13cc)}.poster-title{position:relative;z-index:1;font-weight:650;text-shadow:0 2px 8px #000}.poster-meta{color:var(--muted);font-size:12px;margin:7px 2px}
+.panel{border:1px solid var(--line);background:rgba(255,255,255,.065);backdrop-filter:blur(22px);border-radius:24px;padding:20px;margin-top:20px}.panel h2{margin-top:0}.field{display:flex;gap:9px;flex-wrap:wrap}.field input{flex:1;min-width:210px;border:1px solid var(--line);background:#080d18aa;color:white;padding:13px 15px;border-radius:14px;outline:none}.addon{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid var(--line)}.addon:last-child{border:0}.small{font-size:12px;color:var(--muted)}.status{padding:10px 13px;border-radius:13px;background:#ffffff10;color:#d9e1ef;margin-top:12px;white-space:pre-wrap}
+.hidden{display:none!important}.empty{color:var(--muted);padding:24px 0}
+.poster{cursor:pointer;transition:transform .18s ease,filter .18s ease}.poster:hover{transform:translateY(-4px);filter:brightness(1.08)}.poster:focus-visible{outline:2px solid #a99cff;outline-offset:4px}
+.detail-backdrop{position:fixed;inset:0;z-index:20;background:#02040bd9;backdrop-filter:blur(18px);display:grid;place-items:center;padding:18px;overflow:auto}
+.detail-dialog{width:min(920px,100%);max-height:min(90vh,900px);overflow:auto;border:1px solid var(--line);border-radius:28px;background:linear-gradient(145deg,#18253aef,#0a101df5);box-shadow:0 28px 100px #000b;position:relative}
+.detail-close{position:sticky;top:12px;float:right;margin:12px 12px 0 0;z-index:2}.detail-layout{display:grid;grid-template-columns:minmax(180px,280px) 1fr;gap:25px;padding:28px}.detail-poster{width:100%;aspect-ratio:2/3;object-fit:cover;border-radius:18px;background:#182338}.detail-copy{padding:12px 8px 20px 0}.detail-copy h2{font-size:clamp(27px,4vw,42px);margin:8px 0}.detail-description{color:#d0d6e2;line-height:1.65;white-space:pre-line}.stream-list{display:grid;gap:9px;margin-top:12px}.stream-item{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:14px;background:#ffffff0b}.stream-item small{display:block;color:var(--muted);margin-top:4px}.detail-video{width:100%;max-height:55vh;background:#000;border-radius:16px;margin-top:14px}.detail-message{color:var(--muted);font-size:13px;margin-top:10px}
+@media(max-width:620px){.detail-layout{grid-template-columns:1fr;padding:18px}.detail-poster{width:min(58%,220px);margin:auto}.detail-copy{padding:0}.detail-dialog{max-height:94vh}}
+
+@media(max-width:760px){.layout{display:block}.side{position:sticky;z-index:5;top:0;height:auto;padding:10px 12px;border-right:0;border-bottom:1px solid var(--line)}.brand{margin:0 4px 9px;font-size:20px}.logo{width:34px;height:34px}.side nav{display:flex;overflow:auto;gap:5px}.side nav button{white-space:nowrap;padding:9px 12px}.side nav button:empty{display:none}main{padding:16px 14px 50px}.hero{min-height:340px;border-radius:25px}.cards{grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:10px}}
+@media(display-mode:standalone){body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="side">
+ <div class="brand"><span class="logo">▶</span><span>stremio</span></div>
+ <nav id="nav">
+  <button class="active" data-view="home">⌂　Accueil</button>
+  <button data-view="Movies">▣　Films</button>
+  <button data-view="Series">▤　Séries</button>
+  <button data-view="Anime">◉　Animés</button>
+  <button data-view="TV">◉　TV en direct</button>
+  <button data-view="search">⌕　Recherche</button>
+  <button data-view="addons">＋　Addons</button>
+ </nav>
+</aside>
+<main>
+ <div class="top"><button id="refresh">↻ Actualiser</button><button id="manage">＋ Addons</button></div>
+ <section id="homeView">
+  <div class="hero"><div class="hero-inner">
+   <div class="eyebrow">STREMIO · LIQUID GLASS</div><h1>Ton univers,<br>à ta façon.</h1>
+   <p>Une interface cinéma pour parcourir les catalogues que tu ajoutes. Les catégories sont créées à partir des catalogues compatibles.</p>
+   <div class="actions"><button class="primary" id="explore">Explorer les catalogues</button><button id="heroAddons">＋ Gérer les addons</button></div>
+  </div></div>
+  <div id="homeRows"></div>
+ </section>
+ <section id="catalogView" class="hidden"><div class="section-head"><h2 id="catalogTitle">Catalogue</h2><span class="hint" id="catalogCount"></span></div><div id="catalogCards" class="cards"></div></section>
+ <section id="searchView" class="hidden"><div class="panel"><h2>Recherche</h2><div class="field"><input id="searchInput" placeholder="Rechercher dans les catalogues chargés…"><button id="searchBtn" class="primary">Rechercher</button></div></div><div id="searchResults" class="cards section"></div></section>
+ <section id="addonsView" class="hidden"><div class="panel"><h2>Gérer les addons</h2><p class="small">Ajoute l’URL du manifeste public d’un addon Stremio compatible. Les addons qui nécessitent une connexion ou bloquent les requêtes du navigateur peuvent ne pas fonctionner ici.</p><div class="field"><input id="manifestUrl" placeholder="https://exemple.com/manifest.json"><button id="addAddon" class="primary">Ajouter</button></div><div id="addonStatus" class="status">Aucun addon ajouté pour le moment.</div><div id="addonList"></div></div></section>
+ <div class="small" style="margin-top:28px">Prototype PWA indépendant · non affilié à Stremio · aucune connexion au compte Stremio intégrée.</div>
+</main>
+</div>
+<div id="detailModal" class="detail-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+ <div class="detail-dialog">
+  <button class="detail-close" id="detailClose" aria-label="Fermer">✕</button>
+  <div class="detail-layout">
+   <div><img id="detailPoster" class="detail-poster" alt=""></div>
+   <div class="detail-copy">
+    <div class="eyebrow" id="detailEyebrow">STREMIO · DÉTAILS</div>
+    <h2 id="detailTitle">Titre</h2>
+    <div class="small" id="detailMeta"></div>
+    <p class="detail-description" id="detailDescription"></p>
+    <div class="actions"><button class="primary" id="openStremio">▶ Ouvrir dans Stremio</button><button id="trailerBtn" class="hidden">▷ Bande-annonce</button></div>
+    <div id="streamArea"></div>
+    <div id="detailStatus" class="detail-message"></div>
+   </div>
+  </div>
+ </div>
+</div>
+<script>
+const $=s=>document.querySelector(s);
+function readSavedAddons(){
+ try{const value=JSON.parse(localStorage.getItem('glass_addons')||'[]');return Array.isArray(value)?value.filter(a=>a&&typeof a.url==='string'&&a.manifest):[];}
+ catch(e){console.warn('Données addons illisibles, liste réinitialisée.',e);return[];}
+}
+const state={addons:readSavedAddons(),items:[],view:'home',detailToken:0};
+const save=()=>localStorage.setItem('glass_addons',JSON.stringify(state.addons));
+const safeText=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function show(view){state.view=view;['homeView','catalogView','searchView','addonsView'].forEach(id=>$('#'+id).classList.add('hidden'));$('#'+({home:'homeView',search:'searchView',addons:'addonsView'}[view]||'catalogView')).classList.remove('hidden');document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===view));if(view==='addons')renderAddons();if(['Movies','Series','Anime','TV'].includes(view))renderCatalog(view);}
+$('#nav').addEventListener('click',e=>{const b=e.target.closest('button[data-view]');if(b)show(b.dataset.view)});
+$('#manage').onclick=$('#heroAddons').onclick=()=>show('addons');$('#explore').onclick=()=>show('Movies');
+function category(item){const t=(item.type||'').toLowerCase(),s=((item.name||'')+' '+(item.id||'')).toLowerCase();if(/channel|tv/.test(t))return'TV';if(/anime|animation/.test(s))return'Anime';if(t==='movie')return'Movies';if(t==='series')return'Series';return t==='tv'?'TV':'Other'}
+function renderCards(items,target){target.innerHTML='';if(!items.length){target.innerHTML='<div class="empty">Aucun résultat chargé pour cette catégorie. Ajoute un addon compatible puis actualise.</div>';return;}items.forEach(it=>{const d=document.createElement('article');d.className='poster';d.tabIndex=0;d.setAttribute('role','button');d.setAttribute('aria-label','Ouvrir '+(it.name||it.title||'la fiche'));d.dataset.index=state.items.indexOf(it);const img=it.poster?`<img loading="lazy" src="${safeText(it.poster)}" alt="">`:'';d.innerHTML=`<div class="poster-art">${img}<div class="poster-title">${safeText(it.name||it.title||'Sans titre')}</div></div><div class="poster-meta">${safeText(it.type||'Catalogue')} ${it.year?'· '+safeText(it.year):''}</div>`;target.append(d);});}
+function addonBase(a){return a.url.replace(/\/manifest\.json(?:\?.*)?$/i,'').replace(/\/$/,'');}
+function hasResource(addon,name,type){return (addon.manifest.resources||[]).some(r=>r===name||(r&&typeof r==='object'&&r.name===name&&(!r.types||!type||r.types.includes(type))));}
+function addonForItem(item){return state.addons.find(a=>a.name===item._addon)||null;}
+function stremioLink(item){return 'stremio:///detail/'+encodeURIComponent(item.type||'movie')+'/'+encodeURIComponent(item.id||'');}
+async function requestAddonJson(url){const r=await fetch(url,{headers:{'Accept':'application/json'}});if(!r.ok)throw Error('HTTP '+r.status);return r.json();}
+function openDetails(item){
+ if(!item)return;
+ const token=++state.detailToken;
+ const modal=$('#detailModal');modal.classList.remove('hidden');document.body.style.overflow='hidden';
+ $('#detailPoster').src=item.poster||'';$('#detailPoster').alt=item.name||item.title||'Affiche';
+ $('#detailTitle').textContent=item.name||item.title||'Sans titre';
+ $('#detailEyebrow').textContent=(item.type||'STREMIO').toUpperCase()+' · FICHE';
+ $('#detailMeta').textContent=[item.year,item.runtime,item.genres&&item.genres.join(' · '),item.imdbRating?'★ '+item.imdbRating:null].filter(Boolean).join('  ·  ');
+ $('#detailDescription').textContent=item.description||'Récupération des informations du film…';
+ $('#detailStatus').textContent='Chargement des informations et des sources disponibles…';
+ $('#streamArea').innerHTML='';
+ $('#openStremio').onclick=()=>{window.location.href=stremioLink(item);};
+ const trailer=item.trailerStreams&&item.trailerStreams[0]&&item.trailerStreams[0].ytId;
+ $('#trailerBtn').classList.toggle('hidden',!trailer);
+ $('#trailerBtn').onclick=()=>{if(trailer)window.open('https://www.youtube.com/watch?v='+encodeURIComponent(trailer),'_blank','noopener');};
+ loadDetailsAndStreams(item,token).catch(err=>{if(token===state.detailToken)$('#detailStatus').textContent='Certaines informations n’ont pas pu être chargées : '+err.message;});
+}
+async function loadDetailsAndStreams(item,token){
+ const type=item.type||'movie',id=item.id;
+ let detailed=item;
+ const candidates=state.addons.filter(a=>hasResource(a,'meta',type));
+ for(const a of candidates){
+  try{const j=await requestAddonJson(addonBase(a)+'/meta/'+encodeURIComponent(type)+'/'+encodeURIComponent(id)+'.json');if(j.meta){detailed={...item,...j.meta};break;}}catch(e){console.warn('Détails indisponibles',a.name,e);}
+ }
+ if(token!==state.detailToken)return;
+ $('#detailTitle').textContent=detailed.name||detailed.title||item.name||'Sans titre';
+ $('#detailPoster').src=detailed.poster||item.poster||'';
+ $('#detailMeta').textContent=[detailed.year,detailed.runtime,detailed.genres&&detailed.genres.join(' · '),detailed.imdbRating?'★ '+detailed.imdbRating:null].filter(Boolean).join('  ·  ');
+ $('#detailDescription').textContent=detailed.description||'Aucun synopsis fourni par les addons installés.';
+ const trailer=detailed.trailerStreams&&detailed.trailerStreams[0]&&detailed.trailerStreams[0].ytId;
+ $('#trailerBtn').classList.toggle('hidden',!trailer);
+ $('#trailerBtn').onclick=()=>{if(trailer)window.open('https://www.youtube.com/watch?v='+encodeURIComponent(trailer),'_blank','noopener');};
+ const streamAddons=state.addons.filter(a=>hasResource(a,'stream',type));
+ let streams=[];
+ for(const a of streamAddons){
+  try{const j=await requestAddonJson(addonBase(a)+'/stream/'+encodeURIComponent(type)+'/'+encodeURIComponent(id)+'.json');(j.streams||[]).forEach(x=>streams.push({...x,_addonName:a.name}));}catch(e){console.warn('Sources indisponibles',a.name,e);}
+ }
+ if(token!==state.detailToken)return;
+ const area=$('#streamArea');area.innerHTML='<h3>Sources de lecture</h3>';
+ if(!streams.length){area.innerHTML+='<p class="detail-message">Aucune source trouvée. Ajoute un addon qui fournit des flux pour ce titre. Le catalogue Cinemeta fournit les fiches, pas les vidéos.</p>';}
+ else{
+  const list=document.createElement('div');list.className='stream-list';
+  streams.forEach((stream,index)=>{
+   const row=document.createElement('div');row.className='stream-item';
+   const label=document.createElement('div');const name=stream.name||stream.title||'Source '+(index+1);const extra=[stream._addonName,stream.description].filter(Boolean).join(' · ');label.innerHTML='<strong>'+safeText(name)+'</strong><small>'+safeText(extra)+'</small>';
+   const action=document.createElement('button');action.textContent=stream.url?'Lire':'Ouvrir Stremio';
+   action.onclick=()=>{if(stream.url&&/^https?:\/\//i.test(stream.url)){const video=$('#detailVideo');if(video)video.remove();const v=document.createElement('video');v.id='detailVideo';v.className='detail-video';v.controls=true;v.playsInline=true;v.src=stream.url;area.append(v);v.play().catch(()=>{});}else{window.location.href=stremioLink(item);}};
+   row.append(label,action);list.append(row);
+  });area.append(list);
+ }
+ $('#detailStatus').textContent=streams.length?streams.length+' source(s) proposée(s). Les liens torrent et certaines sources externes nécessitent l’application Stremio.':'Fiche chargée. Pour lire, installe un addon de sources compatible.';
+}
+function closeDetails(){state.detailToken++;$('#detailModal').classList.add('hidden');document.body.style.overflow='';const v=$('#detailVideo');if(v){v.pause();v.remove();}}
+$('#detailClose').onclick=closeDetails;
+$('#detailModal').addEventListener('click',e=>{if(e.target===$('#detailModal'))closeDetails();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('#detailModal').classList.contains('hidden'))closeDetails();});
+document.addEventListener('click',e=>{const card=e.target.closest('.poster[data-index]');if(card){const item=state.items[Number(card.dataset.index)];openDetails(item);}});
+document.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.matches('.poster[data-index]')){e.preventDefault();const card=e.target;const item=state.items[Number(card.dataset.index)];openDetails(item);}});
+function renderCatalog(v){const arr=state.items.filter(x=>category(x)===v);$('#catalogTitle').textContent=({Movies:'Films',Series:'Séries',Anime:'Animés',TV:'TV en direct'})[v]||v;$('#catalogCount').textContent=arr.length+' éléments';renderCards(arr,$('#catalogCards'));}
+function renderHome(){const root=$('#homeRows');root.innerHTML='';[['Movies','Films'],['Series','Séries'],['Anime','Animés'],['TV','TV en direct']].forEach(([key,label])=>{const arr=state.items.filter(x=>category(x)===key).slice(0,8);if(!arr.length)return;const sec=document.createElement('section');sec.className='section';sec.innerHTML=`<div class="section-head"><h2>${label}</h2><span class="hint">${arr.length} éléments</span></div><div class="cards"></div>`;renderCards(arr,sec.querySelector('.cards'));root.append(sec);});if(!root.children.length)root.innerHTML='<div class="section empty">Ajoute un manifeste d’addon pour commencer à afficher les catalogues.</div>';}
+function renderAddons(){const root=$('#addonList');root.innerHTML='';if(!state.addons.length)root.innerHTML='<div class="empty">Aucun addon enregistré.</div>';state.addons.forEach((a,i)=>{const d=document.createElement('div');d.className='addon';d.innerHTML=`<div><strong>${safeText(a.name)}</strong><div class="small">${safeText(a.url)}</div></div><button data-remove="${i}">Supprimer</button>`;root.append(d)});}
+$('#addonList').addEventListener('click',e=>{const b=e.target.closest('[data-remove]');if(!b)return;state.addons.splice(+b.dataset.remove,1);save();renderAddons();refreshAll();});
+async function addAddon(){const url=$('#manifestUrl').value.trim();if(!/^https:\/\/.+/i.test(url)){ $('#addonStatus').textContent='Entre une adresse HTTPS valide.';return;}$('#addonStatus').textContent='Lecture du manifeste…';try{const r=await fetch(url);if(!r.ok)throw Error('HTTP '+r.status);const m=await r.json();if(!m||!Array.isArray(m.resources))throw Error('Manifeste invalide ou incompatible.');if(state.addons.some(a=>a.url===url))throw Error('Cet addon est déjà ajouté.');state.addons.push({url,name:m.name||m.id||'Addon Stremio',manifest:m});save();$('#manifestUrl').value='';$('#addonStatus').textContent='Addon ajouté : '+(m.name||m.id||url);renderAddons();await refreshAll();}catch(e){$('#addonStatus').textContent='Impossible de charger cet addon : '+e.message+'. Il peut bloquer les requêtes CORS ou demander une authentification.';}}
+$('#addAddon').onclick=addAddon;
+async function loadAddon(a){
+ const m=a.manifest||{};
+ // Stremio manifests may declare resources as strings (e.g. "catalog") or objects.
+ const hasCatalog=hasResource(a,'catalog');
+ if(!hasCatalog)return [];
+ const types=[...new Set((m.types||[]).filter(Boolean))];
+ const catalogs=(m.catalogs||[]).filter(c=>c&&c.id&&c.type&&types.includes(c.type)&&!(c.extraRequired||[]).length);
+ const base=addonBase(a);
+ let out=[];
+ for(const cat of catalogs){
+  const type=cat.type;
+  const u=base+'/catalog/'+encodeURIComponent(type)+'/'+encodeURIComponent(cat.id)+'.json';
+  try{
+   const r=await fetch(u,{headers:{'Accept':'application/json'}});
+   if(!r.ok)continue;
+   const j=await r.json();
+   (j.metas||[]).forEach(x=>out.push({...x,type:x.type||type,_addon:a.name,_catalog:cat.name||cat.id}));
+  }catch(e){console.warn('Catalogue non chargé:',u,e);}
+ }
+ return out;
+}
+async function refreshAll(){
+ $('#addonStatus').textContent=state.addons.length?'Chargement des catalogues…':'Ajoute un addon compatible pour charger ses catalogues.';
+ let all=[];
+ for(const a of state.addons){try{all=all.concat(await loadAddon(a));}catch(e){console.warn(e);}}
+ const seen=new Set();
+ state.items=all.filter(x=>{const k=(x.type||'')+':'+(x.id||x.name);if(seen.has(k))return false;seen.add(k);return true;});
+ renderHome();
+ if(state.view!=='addons')$('#addonStatus').textContent=state.items.length?'':(state.addons.length?'Aucun catalogue reçu. Vérifie la connexion puis appuie sur Actualiser.':'');
+ if(['Movies','Series','Anime','TV'].includes(state.view))renderCatalog(state.view);
+}
+$('#refresh').onclick=refreshAll;$('#searchBtn').onclick=()=>{const q=$('#searchInput').value.trim().toLowerCase();renderCards(state.items.filter(x=>(x.name||'').toLowerCase().includes(q)|| (x.description||'').toLowerCase().includes(q)),$('#searchResults'));};$('#searchInput').addEventListener('keydown',e=>{if(e.key==='Enter')$('#searchBtn').click()});
+if('serviceWorker' in navigator && location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
+renderHome();renderAddons();if(state.addons.length)refreshAll();
+</script>
+</body></html>
